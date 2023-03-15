@@ -1,7 +1,7 @@
 ## VitaSDK. How to build.
 
 ```
-apt-get install cmake git build-essential autoconf texinfo bison flex libtool
+apt-get install cmake git build-essential autoconf texinfo bison flex libtool python3 python-is-python3
 ```
 
 ### Native compilation.
