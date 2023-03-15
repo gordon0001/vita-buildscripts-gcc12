@@ -8,8 +8,8 @@ cmake_minimum_required(VERSION 3.2.0)
 project(vitasdk)
 
 # Use the following gcc version
-set(GCC_VERSION 10.3.0)
-set(GCC_HASH SHA256=64f404c1a650f27fc33da242e1f2df54952e3963a49e06e73f6940f3223ac344)
+set(GCC_VERSION 12.2.0)
+set(GCC_HASH SHA256=e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff)
 
 set(ZLIB_VERSION 1.2.13)
 set(ZLIB_HASH SHA256=d14c38e313afc35a9a8760dadf26042f51ea0f5d154b0630a31da0540107fb98)
@@ -17,28 +17,28 @@ set(ZLIB_HASH SHA256=d14c38e313afc35a9a8760dadf26042f51ea0f5d154b0630a31da054010
 set(LIBELF_VERSION 0.8.13)
 set(LIBELF_HASH SHA256=591a9b4ec81c1f2042a97aa60564e0cb79d041c52faa7416acb38bc95bd2c76d)
 
-set(LIBYAML_VERSION 0.2.2)
-set(LIBYAML_HASH SHA256=4a9100ab61047fd9bd395bcef3ce5403365cafd55c1e0d0299cde14958e47be9)
+set(LIBYAML_VERSION 0.2.5)
+set(LIBYAML_HASH SHA256=c642ae9b75fee120b2d96c712538bd2cf283228d2337df2cf2988e3c02678ef4)
 
-set(GMP_VERSION 6.1.2)
-set(GMP_HASH SHA256=5275bb04f4863a13516b2f39392ac5e272f5e1bb8057b18aec1c9b79d73d8fb2)
+set(GMP_VERSION 6.2.1)
+set(GMP_HASH SHA256=eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c)
 
-set(MPFR_VERSION 4.0.2)
-set(MPFR_HASH SHA256=c05e3f02d09e0e9019384cdd58e0f19c64e6db1fd6f5ecf77b4b1c61ca253acc)
+set(MPFR_VERSION 4.2.0)
+set(MPFR_HASH SHA256=691db39178e36fc460c046591e4b0f2a52c8f2b3ee6d750cc2eab25f1eaa999d)
 
-set(MPC_VERSION 1.1.0)
-set(MPC_HASH SHA256=6985c538143c1208dcb1ac42cedad6ff52e267b47e5f970183a3e75125b43c2e)
+set(MPC_VERSION 1.3.1)
+set(MPC_HASH SHA256=ab642492f5cf882b74aa0cb730cd410a81edcdbec895183ce930e706c1c759b8)
 
-set(ISL_VERSION 0.21)
+set(ISL_VERSION 0.24)
 
-set(EXPAT_VERSION 2.3.0)
-set(EXPAT_HASH SHA256=f122a20eada303f904d5e0513326c5b821248f2d4d2afbf5c6f1339e511c0586)
+set(EXPAT_VERSION 2.5.0)
+set(EXPAT_HASH SHA256=6f0e6e01f7b30025fa05c85fdad1e5d0ec7fd35d9f61b22f34998de11969ff67)
 
-set(BINUTILS_VERSION 2.34)
-set(BINUTILS_HASH SHA256=f00b0e8803dc9bab1e2165bd568528135be734df3fabf8d0161828cd56028952)
+set(BINUTILS_VERSION 2.40)
+set(BINUTILS_HASH SHA256=0f8a4c272d7f17f369ded10a4aca28b8e304828e95526da482b0ccc4dfc9d8e1)
 
-set(GDB_VERSION 9.2)
-set(GDB_HASH SHA256=360cd7ae79b776988e89d8f9a01c985d0b1fa21c767a4295e5f88cb49175c555)
+set(GDB_VERSION 10.2)
+set(GDB_HASH SHA256=aaa1223d534c9b700a8bec952d9748ee1977513f178727e1bee520ee000b4f29)
 
 # Branches to fetch the different project targets. Can be overriden from command line.
 set(LIBZIP_TAG master CACHE STRING "libzip branch name, commit id or tag")
@@ -267,7 +267,7 @@ function(toolchain_deps toolchain_deps_dir toolchain_install_dir toolchain_suffi
         )
 
     ExternalProject_add(expat${suffix}
-        URL https://github.com/libexpat/libexpat/releases/download/R_2_3_0/expat-${EXPAT_VERSION}.tar.bz2
+        URL https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-${EXPAT_VERSION}.tar.bz2
         URL_HASH ${EXPAT_HASH}
         DOWNLOAD_DIR ${DOWNLOAD_DIR}
         CONFIGURE_COMMAND ${compiler_flags} ${wrapper_command} <SOURCE_DIR>/configure
@@ -319,6 +319,7 @@ function(toolchain_deps toolchain_deps_dir toolchain_install_dir toolchain_suffi
         )
 
     ExternalProject_Add(gdb${suffix}
+	    DEPENDS gmp${suffix} expat${suffix} isl${suffix} mpc${suffix} mpfr${suffix}
         URL https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VERSION}.tar.xz
         URL_HASH ${GDB_HASH}
         DOWNLOAD_DIR ${DOWNLOAD_DIR}
@@ -330,6 +331,11 @@ function(toolchain_deps toolchain_deps_dir toolchain_install_dir toolchain_suffi
         # Set prefix to "/" here to be able to install twice
         --prefix=/
         --with-sysroot=${toolchain_install_dir}
+	--with-isl=${toolchain_deps_dir}
+	--with-gmp=${toolchain_deps_dir}
+	--with-mpfr=${toolchain_deps_dir}
+	--with-mpc=${toolchain_deps_dir}
+	--with-expat=${toolchain_deps_dir}
         BUILD_COMMAND $(MAKE)
         INSTALL_COMMAND $(MAKE) install DESTDIR=${toolchain_install_dir}
         )
@@ -463,6 +469,7 @@ ExternalProject_add(gcc-base
     URL_HASH ${GCC_HASH}
     DOWNLOAD_DIR ${DOWNLOAD_DIR}
     PATCH_COMMAND patch -d <SOURCE_DIR> -p1 -t -N < ${PROJECT_SOURCE_DIR}/patches/gcc/0001-gcc-8.patch
+    	&& patch -u -d <SOURCE_DIR> -p1 -t -N < ${PROJECT_SOURCE_DIR}/patches/gcc/libgomp.patch
     CONFIGURE_COMMAND ${compiler_flags} ${wrapper_command} <SOURCE_DIR>/configure
     --build=${build_native}
     # compile a native compiler so keep host == build
@@ -555,6 +562,7 @@ if(CMAKE_TOOLCHAIN_FILE)
         URL_HASH ${GCC_HASH}
         DOWNLOAD_DIR ${DOWNLOAD_DIR}
         PATCH_COMMAND patch -d <SOURCE_DIR> -p1 -t -N < ${PROJECT_SOURCE_DIR}/patches/gcc/0001-gcc-8.patch
+		&& patch -u -d <SOURCE_DIR> -p1 -t -N < ${PROJECT_SOURCE_DIR}/patches/gcc/libgomp.patch
         CONFIGURE_COMMAND ${compiler_flags} ${toolchain_tools}
         ${wrapper_command} <SOURCE_DIR>/configure
         --build=${build_native}
@@ -611,6 +619,7 @@ ExternalProject_add(gcc-final
     URL_HASH ${GCC_HASH}
     DOWNLOAD_DIR ${DOWNLOAD_DIR}
     PATCH_COMMAND patch -d <SOURCE_DIR> -p1 -t -N < ${PROJECT_SOURCE_DIR}/patches/gcc/0001-gcc-8.patch
+    	&& patch -u -d <SOURCE_DIR> -p1 -t -N < ${PROJECT_SOURCE_DIR}/patches/gcc/libgomp.patch
     CONFIGURE_COMMAND ${compiler_flags} ${toolchain_tools} ${compiler_target_tools}
     ${wrapper_command} <SOURCE_DIR>/configure
     --build=${build_native}

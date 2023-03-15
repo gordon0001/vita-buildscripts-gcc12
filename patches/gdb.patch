@@ -99,11 +99,11 @@ index caa42be1c0..b4607a7604 100644
  arm*-*-*)
  	# Target: ARM embedded system
  	gdb_target_obs="arm-pikeos-tdep.o"
-diff --git a/gdb/defs.h b/gdb/defs.h
+diff --git a/gdb/osabi.h b/gdb/osabi.h
 index 567f214b81..d795cae8bd 100644
---- a/gdb/defs.h
-+++ b/gdb/defs.h
-@@ -496,6 +496,7 @@ enum gdb_osabi
+--- a/gdb/osabi.h
++++ b/gdb/osabi.h
+@@ -24,6 +24,7 @@ enum gdb_osabi
    GDB_OSABI_NEWLIB,
    GDB_OSABI_SDE,
    GDB_OSABI_PIKEOS,

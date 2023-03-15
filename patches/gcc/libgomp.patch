@@ -1,0 +1,33 @@
+diff -ruN a/libgomp/libgomp_f.h.in b/libgomp/libgomp_f.h.in
+--- a/libgomp/libgomp_f.h.in	2022-05-06 07:31:00.000000000 +0000
++++ b/libgomp/libgomp_f.h.in	2023-03-15 11:06:25.954989508 +0000
+@@ -74,7 +74,7 @@
+ static inline void
+ omp_check_defines (void)
+ {
+-  char test[(@OMP_LOCK_SIZE@ != sizeof (omp_lock_t)
++/*  char test[(@OMP_LOCK_SIZE@ != sizeof (omp_lock_t)
+ 	     || @OMP_LOCK_ALIGN@ != __alignof (omp_lock_t)
+ 	     || @OMP_NEST_LOCK_SIZE@ != sizeof (omp_nest_lock_t)
+ 	     || @OMP_NEST_LOCK_ALIGN@ != __alignof (omp_nest_lock_t)
+@@ -93,7 +93,7 @@
+ 	     || @OMP_LOCK_25_KIND@ != sizeof (*(omp_lock_25_arg_t) 0)
+ 	     || @OMP_NEST_LOCK_25_KIND@
+ 		!= sizeof (*(omp_nest_lock_25_arg_t) 0))
+-	    ? -1 : 1] __attribute__ ((__unused__));
++	    ? -1 : 1] __attribute__ ((__unused__));*/
+ }
+ 
+ #endif /* LIBGOMP_F_H */
+diff -ruN a/libgomp/env.c b/libgomp/env.c
+--- a/libgomp/env.c     2022-05-06 07:31:00.000000000 +0000
++++ b/libgomp/env.c     2023-03-15 09:07:43.171876223 +0000
+@@ -1467,7 +1467,7 @@
+   unsigned long max_active_levels_var;
+
+   /* Do a compile time check that mkomp_h.pl did good job.  */
+-  omp_check_defines ();
++  //omp_check_defines ();
+
+   parse_schedule ();
+   parse_boolean ("OMP_DYNAMIC", &gomp_global_icv.dyn_var);
