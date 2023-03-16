@@ -15,7 +15,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update
-        apt-get install -y cmake cmake-data git build-essential autoconf automake libtool texinfo bison flex pkg-config python3 python-is-python3
+        apt-get install -y locales cmake cmake-data git build-essential autoconf automake libtool texinfo bison flex pkg-config python3 python-is-python3
         echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
         locale-gen
     - name: Build
@@ -26,7 +26,7 @@ jobs:
         cd build
         export LANG=en_US.UTF-8
         cmake ..
-        LANG=en_US.UTF-8 make -j1 tarball
+        make -j1 tarball
     - name: Upload artifacts
       if: ${{ success() }}
       uses: actions/upload-artifact@v3
