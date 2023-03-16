@@ -9,16 +9,15 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-    container: ubuntu:14.04
+    container: ubuntu:22.04
     steps:
     - uses: actions/checkout@v3
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y software-properties-common
-        sudo add-apt-repository ppa:george-edison55/cmake-3.x
-        sudo apt-get update
-        sudo apt-get install -y language-pack-en cmake cmake-data git build-essential autoconf automake libtool texinfo bison flex pkg-config python 
+        apt-get update
+        apt-get install -y cmake cmake-data git build-essential autoconf automake libtool texinfo bison flex pkg-config python3 python-is-python3
+        echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+        locale-gen
     - name: Build
       run: |
         git config --global user.email "builds@travis-ci.com"
@@ -35,7 +34,7 @@ jobs:
         name: vitasdk-linux
         path: build/*.tar.bz2
   build-macos:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v2
